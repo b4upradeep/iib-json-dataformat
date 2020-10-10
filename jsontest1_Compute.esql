@@ -1,0 +1,43 @@
+CREATE COMPUTE MODULE jsontest1_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		
+		-- CALL CopyMessageHeaders();
+		-- CALL CopyEntireMessage();
+		DECLARE number1 CHARACTER;
+		DECLARE number2 CHARACTER;
+		SET number1 = InputRoot.JSON.Data.number1;
+		SET number2 = InputRoot.JSON.Data.number2;
+		IF(LENGTH(number1)=0)OR (number1 is null) or (LENGTH(number2)=0) or (number2 is null) then
+	
+			SET OutputRoot.JSON.Data.success = false;
+			SET OutputRoot.JSON.Data.message = 'Enter valid values for number1 and number2';
+
+		else 
+			SET OutputRoot.JSON.Data.success = true;
+			SET OutputRoot.JSON.Data.data.number1 = number1;
+			SET OutputRoot.JSON.Data.data.number2 =  number2;
+			SET OutputRoot.JSON.Data.data.sum = InputRoot.JSON.Data.number1 + InputRoot.JSON.Data.number2;
+			SET OutputRoot.JSON.Data.data.difference = InputRoot.JSON.Data.number1 - InputRoot.JSON.Data.number2;
+			SET OutputRoot.JSON.Data.data.product = InputRoot.JSON.Data.number1 * InputRoot.JSON.Data.number2;
+			SET OutputRoot.JSON.Data.data.quotient = InputRoot.JSON.Data.number1 / InputRoot.JSON.Data.number2;
+			SET OutputRoot.JSON.Data.data.modulus = MOD(InputRoot.JSON.Data.number1 , InputRoot.JSON.Data.number2);
+		
+	end if;
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
